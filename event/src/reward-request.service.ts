@@ -20,7 +20,14 @@ export class RewardRequestService {
     const eventId = new Types.ObjectId(eventIdStr);
     const exists = await this.requestModel.exists({ userId, eventId });
     if (exists) {
-      throw new ConflictException('Already requested.');
+      const reason = 'Already requested.';
+      await this.requestModel.create({
+        userId,
+        eventId,
+        status: 'FAILED',
+        reason,
+      });
+      throw new ConflictException(reason);
     }
 
     // 지금은 조건 검증 생략 또는 always true
@@ -29,7 +36,7 @@ export class RewardRequestService {
       userId,
       eventId,
       status,
-      reason: 'Some..',
+      reason: 'Achieved successfully.',
     });
     return result.save();
   }
