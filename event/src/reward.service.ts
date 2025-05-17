@@ -40,10 +40,6 @@ export class RewardService {
     });
   }
 
-  async findByEvent(eventId: string): Promise<Reward[]> {
-    return await this.rewardModel.find({ eventId }).exec();
-  }
-
   /**
    * 리워드 타입 존재여부
    * @param type

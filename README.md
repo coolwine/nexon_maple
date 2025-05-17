@@ -63,7 +63,7 @@ npm run test:e2e
 
 ### 3. 종료
 ```bash
-docker-compose down
+docker compose down
 ```
 
 ---
@@ -79,6 +79,12 @@ docker-compose down
 
 ---
 
+## 🗃️ MongoDB Database
+| DB      | Collection                                   |
+|---------|----------------------------------------------|
+| auth    | users                                        |
+| event   | events, rewardRequests, rewards, rewardTypes |
+
 ## 📌 주요 API 요약
 
 ### 📍 Auth 서비스
@@ -91,17 +97,19 @@ docker-compose down
 
 ### 📍 Event 서비스
 
-| 메서드 | 경로 | 설명 |
-|--------|------|------|
-| POST | `/event` | 이벤트 등록 *(OPERATOR 이상)* |
-| GET | `/event` | 전체 이벤트 조회 |
+| 메서드 | 경로          | 설명                     |
+|--------|-------------|------------------------|
+| POST | `/event`    | 이벤트 등록 *(OPERATOR 이상)* |
+| GET | `/event`    | 전체 이벤트 조회              |
+| GET | `/event:id` | 이벤트 세부 내용 조회 |
 
 ### 📍 Reward 서비스
 
-| 메서드 | 경로             | 설명 |
-|--------|----------------|------|
-| POST | `/reward`      | 이벤트 보상 등록 *(OPERATOR 이상)* |
-| GET | `/reward/[id]` | 특정 이벤트의 보상 목록 |
+| 메서드 | 경로               | 설명                        |
+|--------|------------------|---------------------------|
+| POST | `/reward/create` | 이벤트 보상 등록 *(OPERATOR 이상)* |
+| POST | `/reward/type`   | 이벤트 타입 등록 *(OPERATOR 이상)* |
+| GET | `/reward/[id]`   | 특정 이벤트의 보상 목록             |
 
 ### 📍 보상 요청
 
@@ -120,6 +128,12 @@ docker-compose down
 NestJS v11은 Node.js 20 이상을 필수로 요구하며,
 Node.js 18은 2025년 4월부로 공식 지원이 종료되었습니다.
 따라서 본 프로젝트는 장기적인 유지보수와 보안성을 고려하여 Node.js 20 버전 기준으로 작성되었습니다.
+```
+
+💡 npm run test:e2e
+```
+시나리오 테스트를 위한 단일 명령어로 전체 시스템의 가용성을 검증할 수 있습니다.
+이는 향후 CI/CD 파이프라인에서 필수적인 단계로 활용될 수 있습니다.
 ```
 
 - **역할 기반 인증**을 통해 서비스 접근 제어를 분리

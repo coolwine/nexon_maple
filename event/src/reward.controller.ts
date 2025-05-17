@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Post,
-  Get,
-  Body,
-  Query,
-  UseGuards,
-  Request,
-} from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Request } from '@nestjs/common';
 import { CreateRewardDto } from './dto/create-reward.dto';
 import { RewardService } from './reward.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
@@ -32,16 +24,6 @@ export class RewardController {
   @Post('create')
   create(@Body() dto: CreateRewardDto) {
     return this.rewardService.create(dto);
-  }
-
-  /**
-   * 특정 이벤트 조회
-   * @param eventId
-   */
-  @UseGuards(JwtAuthGuard)
-  @Get()
-  findByEvent(@Query('eventId') eventId: string) {
-    return this.rewardService.findByEvent(eventId);
   }
 
   /**
