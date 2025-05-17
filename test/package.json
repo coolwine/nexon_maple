@@ -1,0 +1,20 @@
+{
+  "name": "maplestory-tests",
+  "version": "1.0.0",
+  "description": "End-to-end tests for Maplestory application",
+  "scripts": {
+    "test": "jest",
+    "test:e2e": "jest --config=jest.config.js"
+  },
+  "dependencies": {
+    "@types/supertest": "^6.0.3",
+    "jest": "^29.7.0",
+    "supertest": "^7.1.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "dotenv": "^16.4.5",
+    "ts-jest": "^29.3.3",
+    "typescript": "^5.4.5"
+  }
+}
