@@ -10,8 +10,6 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RequestRewardDto } from './dto/request-reward.dto';
 import { RewardRequestService } from './reward-request.service';
 import { Roles } from './roles.decorator';
-import { RolesGuard } from './guards/roles.guard';
-import { CreateRewardDto } from './dto/create-reward.dto';
 import { User } from './dto/user.dto';
 
 interface Req extends Request {

@@ -48,6 +48,15 @@ describe("전체 e2e 테스트", () => {
     isActive: true
   }
 
+  const testEventOVer = {
+    title: `[test]테스트 이벤트-${new Date().getTime()}`,
+    description: "종료된 이벤트",
+    condition: "login_7_days",
+    startDate: new Date(Date.now() - 86400000 * 7).toISOString(), // 7일전
+    endDate: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2시간전
+    isActive: true
+  }
+
   /**********************************
    * 유저 테스트
    **********************************/
@@ -129,6 +138,7 @@ describe("전체 e2e 테스트", () => {
    **********************************/
   describe("이벤트", () => {
     let lastEventId: string
+    let lastEventOverId: string
 
     it("일반 사용자가 이벤트 생성 시도 → 403", async () => {
       await request(url.base)
@@ -147,6 +157,18 @@ describe("전체 e2e 테스트", () => {
 
       const event = JSON.parse(response.text)
       lastEventId = event._id
+    })
+
+    it("관리자가 이벤트 생성[종료된이벤트] → 201", async () => {
+      const response = await request(url.base)
+        .post(url.event)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send(testEventOVer)
+        .expect(201)
+
+      console.log(response.text)
+      const event = JSON.parse(response.text)
+      lastEventOverId = event._id
     })
 
     it("이벤트 조회", async () => {
@@ -234,11 +256,28 @@ describe("전체 e2e 테스트", () => {
           .expect(201)
       })
 
-      it("보상 요청[중복] → 201", async () => {
+      it("보상 요청[중복] → 409", async () => {
         await request(url.base)
           .post(url.rewardRequest)
           .set('Authorization', `Bearer ${userToken}`)
           .send({ eventId: lastEventId })
+          .expect(409)
+      })
+
+      it("보상 요청[미존재] → 404", async () => {
+        const eventId = lastEventId.slice(0, -1) + "0"
+        await request(url.base)
+          .post(url.rewardRequest)
+          .set('Authorization', `Bearer ${userToken}`)
+          .send({ eventId })
+          .expect(404)
+      })
+
+      it("보상 요청[이벤트 종료] → 409", async () => {
+        await request(url.base)
+          .post(url.rewardRequest)
+          .set('Authorization', `Bearer ${userToken}`)
+          .send({ eventId: lastEventOverId })
           .expect(409)
       })
 

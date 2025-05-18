@@ -1,16 +1,22 @@
 import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { Injectable, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import {
   RewardRequest,
   RewardRequestDocument,
 } from './schemas/reward-request.schema';
+import { Event, EventDocument } from './schemas/event.schema';
 
 @Injectable()
 export class RewardRequestService {
   constructor(
     @InjectModel(RewardRequest.name)
     private requestModel: Model<RewardRequestDocument>,
+    @InjectModel(Event.name) private eventModel: Model<EventDocument>,
   ) {}
 
   async requestReward(
@@ -18,6 +24,15 @@ export class RewardRequestService {
     eventIdStr: string,
   ): Promise<RewardRequest> {
     const eventId = new Types.ObjectId(eventIdStr);
+    const event = await this.eventModel.findById(eventId);
+    if (!event) {
+      throw new NotFoundException('Event not found.');
+    }
+
+    if (event.endDate < new Date()) {
+      throw new ConflictException('Event is over.');
+    }
+
     const exists = await this.requestModel.exists({ userId, eventId });
     if (exists) {
       const reason = 'Already requested.';
