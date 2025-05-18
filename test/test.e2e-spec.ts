@@ -17,6 +17,7 @@ const url = {
 describe("전체 e2e 테스트", () => {
   let userToken: string;
   let adminToken: string;
+  let auditToken: string;
   const testUser = {
     email: "test-user+" + Date.now() + "@example.com",
     password: "1234",
@@ -29,6 +30,13 @@ describe("전체 e2e 테스트", () => {
     password: "1234",
     name: "AdminTester",
     role: "ADMIN",
+  }
+
+  const testAudit = {
+    email: "test-audit+" + Date.now() + "@example.com",
+    password: "1234",
+    name: "AuditTester",
+    role: "AUDITOR",
   }
 
   const testEvent = {
@@ -62,14 +70,18 @@ describe("전체 e2e 테스트", () => {
         .expect(201)
     })
 
+    it("사용자 등록[감사] → 201", async () => {
+      await request(url.base)
+        .post(url.register)
+        .send(testAudit)
+        .expect(201)
+    })
+
     describe("로그인", () => {
       it("사용자 로그인 → 200", async () => {
         const response = await request(url.base)
           .post(url.login)
-          .send({
-            email: testUser.email,
-            password: testUser.password
-          })
+          .send({ email: testUser.email, password: testUser.password })
           .expect(201)
 
         expect(response.body).toHaveProperty('accessToken');
@@ -79,14 +91,21 @@ describe("전체 e2e 테스트", () => {
       it("관리자 로그인 → 200", async () => {
         const response = await request(url.base)
           .post(url.login)
-          .send({
-            email: testAdmin.email,
-            password: testAdmin.password
-          })
+          .send({ email: testAdmin.email, password: testAdmin.password })
           .expect(201)
 
         expect(response.body).toHaveProperty('accessToken')
         adminToken = response.body.accessToken
+      });
+
+      it("감사자 로그인 → 200", async () => {
+        const response = await request(url.base)
+          .post(url.login)
+          .send({ email: testAudit.email, password: testAudit.password })
+          .expect(201)
+
+        expect(response.body).toHaveProperty('accessToken')
+        auditToken = response.body.accessToken
       });
 
       it("사용자 정보 조회 → 200", async () => {
@@ -232,10 +251,19 @@ describe("전체 e2e 테스트", () => {
         expect(Array.isArray(res.body)).toBe(true);
       })
 
-      it("보상 내역 요청[감사] → 201", async () => {
+      it("보상 내역 요청[관리자] → 201", async () => {
         const res = await request(url.base)
           .get(url.rewardHistoryAll)
           .set('Authorization', `Bearer ${adminToken}`)
+          .expect(200)
+
+        expect(Array.isArray(res.body)).toBe(true);
+      })
+
+      it("보상 내역 요청[감사자] → 201", async () => {
+        const res = await request(url.base)
+          .get(url.rewardHistoryAll)
+          .set('Authorization', `Bearer ${auditToken}`)
           .expect(200)
 
         expect(Array.isArray(res.body)).toBe(true);
