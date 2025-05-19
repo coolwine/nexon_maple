@@ -1,11 +1,19 @@
+networks:
+  backend:
+  public:
+
 services:
   mongo:
     image: mongo
     container_name: mongo
-    ports:
-      - "27017:27017"
+    #    ports:
+    #      - "27017:27017"
     volumes:
       - mongo_data:/data/db
+    networks:
+      - backend
+    expose:
+      - "27017"
 
   gateway:
     build: ./gateway
@@ -15,25 +23,32 @@ services:
       - auth
       - event
       - mongo
+    networks:
+      - backend
+      - public
     environment:
       - MONGO_URI=mongodb://mongo:27017/gateway
 
   auth:
     build: ./auth
-    ports:
-      - "3001:3000"
+    #    ports:
+    #      - "3001:3000"
     depends_on:
       - mongo
+    networks:
+      - backend
     environment:
       - MONGO_URI=mongodb://mongo:27017/auth
       - JWT_SECRET=supersecret
 
   event:
     build: ./event
-    ports:
-      - "3002:3000"
+    #    ports:
+    #      - "3002:3000"
     depends_on:
       - mongo
+    networks:
+      - backend
     environment:
       - MONGO_URI=mongodb://mongo:27017/event
 
