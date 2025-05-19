@@ -166,7 +166,6 @@ describe("전체 e2e 테스트", () => {
         .send(testEventOVer)
         .expect(201)
 
-      console.log(response.text)
       const event = JSON.parse(response.text)
       lastEventOverId = event._id
     })
